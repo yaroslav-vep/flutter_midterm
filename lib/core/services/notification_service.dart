@@ -1,94 +1,111 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_messaging/firebase_messaging.dart'; // Импорт FCM
 
-/// Сервис для управления локальными push-уведомлениями.
-/// Singleton-паттерн — один экземпляр на всё приложение.
+/// Сервис для управления уведомлениями (Локальные + Firebase).
 class NotificationService {
-  // Singleton
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _plugin =
+  final FlutterLocalNotificationsPlugin _localPlugin =
       FlutterLocalNotificationsPlugin();
+  
+  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
   bool _initialized = false;
 
-  /// Детали канала уведомлений для Android
   static const AndroidNotificationChannel _channel = AndroidNotificationChannel(
-    'quiz_channel', // id
-    'Quiz Notifications', // name
+    'quiz_channel',
+    'Quiz Notifications',
     description: 'Уведомления приложения Quiz',
     importance: Importance.high,
   );
 
-  /// Инициализация плагина и запрос разрешений
   Future<void> initialize() async {
     if (_initialized) return;
 
-    // Настройки для Android
-    const androidSettings = AndroidInitializationSettings(
-      '@mipmap/ic_launcher', // Иконка из ресурсов приложения
-    );
+    // 1. Инициализация локальных уведомлений
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const initSettings = InitializationSettings(android: androidSettings);
 
-    const initSettings = InitializationSettings(
-      android: androidSettings,
-    );
-
-    await _plugin.initialize(
+    await _localPlugin.initialize(
       initSettings,
-      onDidReceiveNotificationResponse: _onNotificationTapped,
+      onDidReceiveNotificationResponse: (details) {
+        debugPrint('Уведомление нажато: ${details.payload}');
+      },
     );
 
-    // Создаём канал уведомлений (Android 8+)
-    await _plugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(
-          AndroidNotificationChannel(
-            _channel.id,
-            _channel.name,
-            description: _channel.description,
-            importance: _channel.importance,
-          ),
-        );
-
-    // Запрашиваем разрешение на уведомления (Android 13+)
-    await _plugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
+    // 2. Настройка FCM (Cloud Messaging)
+    await _setupFirebaseMessaging();
 
     _initialized = true;
-    debugPrint('NotificationService: инициализирован');
+    debugPrint('NotificationService: Полная инициализация завершена');
   }
 
-  /// Обработчик нажатия на уведомление
-  void _onNotificationTapped(NotificationResponse response) {
-    debugPrint('Уведомление нажато: ${response.payload}');
+  Future<void> _setupFirebaseMessaging() async {
+    // Запрос разрешений для iOS/Android 13+
+    NotificationSettings settings = await _fcm.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      debugPrint('FCM: Разрешение получено');
+      
+      // Получение токена (нужен для отправки уведомлений конкретному пользователю)
+      String? token = await _fcm.getToken();
+      debugPrint('FCM Token: $token'); // Выводим в консоль для тестов
+    }
+
+    // Обработка уведомлений, когда приложение открыто (Foreground)
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      debugPrint('Получено сообщение в foreground: ${message.notification?.title}');
+      
+      // Показываем локальное уведомление, так как в foreground они не всплывают сами
+      if (message.notification != null) {
+        _showLocalFromRemote(message.notification!);
+      }
+    });
   }
 
-  /// Показать уведомление при старте теста
+  /// Показ локального уведомления на основе данных из Firebase
+  Future<void> _showLocalFromRemote(RemoteNotification notification) async {
+    final androidDetails = AndroidNotificationDetails(
+      _channel.id,
+      _channel.name,
+      channelDescription: _channel.description,
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+
+    await _localPlugin.show(
+      notification.hashCode,
+      notification.title,
+      notification.body,
+      NotificationDetails(android: androidDetails),
+    );
+  }
+
+  // --- Методы для локальных уведомлений (остаются без изменений) ---
+
   Future<void> showStartNotification() async {
     await _showNotification(
       id: 0,
       title: '🚀 Тест начат!',
       body: 'Удачи! Ответьте на все вопросы правильно',
-      payload: 'quiz_start',
     );
   }
 
-  /// Показать уведомление о прогрессе (каждые 5 вопросов)
   Future<void> showProgressNotification(int answeredCount) async {
     await _showNotification(
       id: 1,
       title: '💡 Продолжайте!',
       body: 'Вы ответили на $answeredCount вопросов. Так держать!',
-      payload: 'quiz_progress',
     );
   }
 
-  /// Показать уведомление с результатом теста
   Future<void> showResultNotification({
     required int score,
     required int total,
@@ -99,16 +116,13 @@ class NotificationService {
       id: 2,
       title: '🏆 Тест завершён!',
       body: 'Результат: $score из $total (${percent.toStringAsFixed(1)}%) — $resultText',
-      payload: 'quiz_result',
     );
   }
 
-  /// Базовый метод отправки уведомления
   Future<void> _showNotification({
     required int id,
     required String title,
     required String body,
-    String? payload,
   }) async {
     final androidDetails = AndroidNotificationDetails(
       _channel.id,
@@ -116,15 +130,9 @@ class NotificationService {
       channelDescription: _channel.description,
       importance: Importance.high,
       priority: Priority.high,
-      icon: '@mipmap/ic_launcher',
-      playSound: true,
-      enableVibration: true,
       styleInformation: BigTextStyleInformation(body),
     );
 
-    final details = NotificationDetails(android: androidDetails);
-
-    await _plugin.show(id, title, body, details, payload: payload);
-    debugPrint('NotificationService: отправлено [$title] $body');
+    await _localPlugin.show(id, title, body, NotificationDetails(android: androidDetails));
   }
 }

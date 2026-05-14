@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "983954518559",
+    "project_id": "flutter-midterm-c21cc",
+    "storage_bucket": "flutter-midterm-c21cc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:983954518559:android:1d1dd25cb178478c3b9b2a",
+        "android_client_info": {
+          "package_name": "com.example.quiz_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfTefI1cZ7zqXUbUibOtxHBqdTsQuLcmE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

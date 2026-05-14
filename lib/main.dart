@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart'; // Импорт Firebase
 import 'viewmodels/quiz_viewmodel.dart';
 import 'ui/screens/home_screen.dart';
 import 'core/services/notification_service.dart';
@@ -7,6 +8,15 @@ import 'core/services/notification_service.dart';
 Future<void> main() async {
   // Обязательно для асинхронных операций до runApp
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Инициализируем Firebase
+  // ПРИМЕЧАНИЕ: Если у вас еще нет файла google-services.json, приложение выдаст ошибку при сборке.
+  try {
+    await Firebase.initializeApp();
+    debugPrint('Firebase: инициализирован успешно');
+  } catch (e) {
+    debugPrint('Firebase Error: $e');
+  }
 
   // Инициализируем сервис уведомлений
   await NotificationService().initialize();
