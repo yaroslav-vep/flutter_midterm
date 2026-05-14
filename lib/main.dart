@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_core/firebase_core.dart'; // Импорт Firebase
+import 'package:firebase_core/firebase_core.dart';
 import 'viewmodels/quiz_viewmodel.dart';
-import 'ui/screens/home_screen.dart';
+import 'ui/screens/welcome_screen.dart';
 import 'core/services/notification_service.dart';
 
 Future<void> main() async {
-  // Обязательно для асинхронных операций до runApp
   WidgetsFlutterBinding.ensureInitialized();
 
   // Инициализируем Firebase
-  // ПРИМЕЧАНИЕ: Если у вас еще нет файла google-services.json, приложение выдаст ошибку при сборке.
   try {
     await Firebase.initializeApp();
     debugPrint('Firebase: инициализирован успешно');
@@ -35,9 +33,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Quiz - Ваша Фамилия',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const HomeScreen(),
+      title: 'Flutter Quiz',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        fontFamily: 'Roboto',
+      ),
+      // Стартовый экран — WelcomeScreen (он сам решит, куда дальше)
+      home: const WelcomeScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

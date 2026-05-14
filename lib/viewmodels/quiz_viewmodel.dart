@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import '../data/quiz_repository.dart';
 import '../models/question.dart';
 import '../core/services/notification_service.dart';
+import '../core/services/analytics_service.dart'; // Импорт аналитики
 
 class QuizViewModel extends ChangeNotifier {
   final QuizRepository _repository = QuizRepository();
   final NotificationService _notifications = NotificationService();
+  final AnalyticsService _analytics = AnalyticsService(); // Сервис аналитики
 
   List<Question> _questions = [];
   int _currentIndex = 0;
@@ -52,22 +54,34 @@ class QuizViewModel extends ChangeNotifier {
   }
 
   void nextQuestion() {
-    if (_selectedAnswer != null && _selectedAnswer == currentQuestion.correctIndex) {
-      _score++;
+    if (_selectedAnswer != null) {
+      bool isCorrect = _selectedAnswer == currentQuestion.correctIndex;
+      if (isCorrect) {
+        _score++;
+      }
+
+      // ЛОГИРУЕМ ОТВЕТ: какой вопрос, какой вариант и правильно ли
+      _analytics.logAnswer(
+        currentQuestion.text,
+        currentQuestion.options[_selectedAnswer!],
+        isCorrect,
+      );
     }
+
     _selectedAnswer = null;
 
     if (_currentIndex < _questions.length - 1) {
       _currentIndex++;
 
-      // Уведомление о прогрессе каждые 5 вопросов (на 5-м, 10-м и т.д.)
       if (_currentIndex % 5 == 0) {
         _notifications.showProgressNotification(_currentIndex);
       }
     } else {
       _isQuizFinished = true;
 
-      // Уведомление с итоговым результатом
+      // ЛОГИРУЕМ ЗАВЕРШЕНИЕ: итоговый результат
+      _analytics.logQuizComplete(_score, totalQuestions);
+
       _notifications.showResultNotification(
         score: _score,
         total: totalQuestions,
@@ -85,6 +99,10 @@ class QuizViewModel extends ChangeNotifier {
     _selectedAnswer = null;
     _isQuizFinished = false;
     _userAnswers = List<int?>.filled(_questions.length, null);
+    
+    // ЛОГИРУЕМ ПЕРЕЗАПУСК (как старт нового теста)
+    _analytics.logQuizStart();
+    
     notifyListeners();
   }
 

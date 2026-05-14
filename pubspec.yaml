@@ -8,6 +8,8 @@ dependencies:
   flutter_local_notifications: ^18.0.1  # Для локальных уведомлений
   firebase_core: ^3.1.0                 # Ядро Firebase
   firebase_messaging: ^15.0.1          # Облачные уведомления (FCM)
+  firebase_analytics: ^11.2.0          # Аналитика
+  shared_preferences: ^2.3.2           # Сохранение: видел ли пользователь онбординг
 
 dev_dependencies:
   flutter_test:
