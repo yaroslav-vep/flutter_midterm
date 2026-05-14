@@ -1,0 +1,30 @@
+name: flutter_quiz_yourname  # Измените на своё, например flutter_quiz_ivanov
+description: Тест по Dart и Flutter (экзаменационное задание)
+
+dependencies:
+  flutter:
+    sdk: flutter
+  provider: ^6.1.2  # Для ChangeNotifierProvider
+  flutter_local_notifications: ^18.0.1  # Для push-уведомлений
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.1  # Для смены иконки
+
+environment:
+  sdk: '^3.4.0'  # Или выше, в зависимости от вашей версии Flutter
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/questions.json
+    # - assets/icon/icon.png  # Раскомментируйте, если добавите свою иконку
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon.png"  # Путь к вашей иконке 1024x1024
+  min_sdk_android: 21

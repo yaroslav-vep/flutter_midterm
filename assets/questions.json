@@ -1,0 +1,112 @@
+[
+  {
+    "text": "Что такое null-safety в Dart?",
+    "options": [
+      "Возможность игнорировать null-проверки",
+      "Система типов, где переменные по умолчанию не могут быть null",
+      "Автоматическая обработка всех исключений",
+      "Фича только для Flutter"
+    ],
+    "correctIndex": 1,
+    "topic": "dart"
+  },
+  {
+    "text": "Как объявить неизменяемую переменную в Dart?",
+    "options": [
+      "var x = 5;",
+      "dynamic x = 5;",
+      "final x = 5;",
+      "const x = 5; // только для compile-time констант"
+    ],
+    "correctIndex": 2,
+    "topic": "dart"
+  },
+  {
+    "text": "В чем разница между async и await в Dart?",
+    "options": [
+      "async делает функцию синхронной",
+      "await ждет завершения Future внутри async-функции",
+      "async возвращает Stream",
+      "Нет разницы"
+    ],
+    "correctIndex": 1,
+    "topic": "dart"
+  },
+  {
+    "text": "Чем StatelessWidget отличается от StatefulWidget?",
+    "options": [
+      "Stateless не имеет состояния и не перестраивается",
+      "Stateful тяжелее по памяти всегда",
+      "Stateless нельзя использовать в дереве",
+      "Разницы нет"
+    ],
+    "correctIndex": 0,
+    "topic": "widgets"
+  },
+  {
+    "text": "Когда Flutter перестраивает widget?",
+    "options": [
+      "Только при hot reload",
+      "Когда изменяется его состояние или родительские зависимости",
+      "Никогда автоматически",
+      "Только при изменении глобальных переменных"
+    ],
+    "correctIndex": 1,
+    "topic": "widgets"
+  },
+  {
+    "text": "Что делает ключ (Key) в списке widgets?",
+    "options": [
+      "Ускоряет анимации",
+      "Помогает Flutter различать одинаковые widgets при перестройке",
+      "Делает widget immutable",
+      "Ничего важного"
+    ],
+    "correctIndex": 1,
+    "topic": "widgets"
+  },
+  {
+    "text": "Где хранятся изображения и другие ресурсы в Flutter-проекте?",
+    "options": [
+      "В lib/",
+      "В assets/ папке, объявленной в pubspec.yaml",
+      "В android/assets",
+      "Автоматически в pub cache"
+    ],
+    "correctIndex": 1,
+    "topic": "structure"
+  },
+  {
+    "text": "Для чего используется pubspec.yaml?",
+    "options": [
+      "Только для зависимостей",
+      "Для зависимостей, assets, fonts и метаданных приложения",
+      "Для кода на Dart",
+      "Для конфигурации AndroidManifest"
+    ],
+    "correctIndex": 1,
+    "topic": "structure"
+  },
+  {
+    "text": "Как добавить HTTP-запросы в Flutter-приложение?",
+    "options": [
+      "Встроено в Flutter",
+      "Через пакет dio или http из pub.dev",
+      "Только через native код",
+      "Нельзя"
+    ],
+    "correctIndex": 1,
+    "topic": "architecture"
+  },
+  {
+    "text": "Как реализовать навигацию между экранами в Flutter?",
+    "options": [
+      "Через setState",
+      "Через Navigator.push/pop или named routes",
+      "Только через BottomNavigationBar",
+      "Через Provider"
+    ],
+    "correctIndex": 1,
+    "topic": "architecture"
+  }
+]
